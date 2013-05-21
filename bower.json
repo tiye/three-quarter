@@ -1,6 +1,9 @@
 {
   "name": "demo-of-threejs",
   "version": "0.0.0",
+  "dependencies": {
+    "threejs": "*"
+  },
   "ignore": [
     "**/.*",
     "node_modules",

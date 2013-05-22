@@ -1,21 +1,20 @@
 
 scene = new THREE.Scene
 ratio = window.innerWidth / window.innerHeight
-camera = new THREE.PerspectiveCamera 75, ratio, 0.1, 1000
+camera = new THREE.PerspectiveCamera 45, ratio, 0.1, 500
+camera.position.set 0, 0, 100
+camera.lookAt (new THREE.Vector3 0, 0, 0)
 
 renderer = new THREE.WebGLRenderer
 renderer.setSize window.innerWidth, window.innerHeight
 document.body.appendChild renderer.domElement
 
-geometry = new THREE.CubeGeometry 1, 1, 1
-material = new THREE.MeshBasicMaterial color: 0x00ff00
-cube = new THREE.Mesh geometry, material
-scene.add cube
+geometry = new THREE.CubeGeometry
+geometry.vertices.push (new THREE.Vector3 -10, 0, 0)
+geometry.vertices.push (new THREE.Vector3 0, 10, 0)
+geometry.vertices.push (new THREE.Vector3 10, 0, 0)
+material = new THREE.LineBasicMaterial color: 0x0000ff
+line = new THREE.Line geometry, material
+scene.add line
 
-camera.position.z = 5
-
-do render = ->
-  requestAnimationFrame render
-  renderer.render scene, camera
-  cube.rotation.x += 0.01
-  cube.rotation.y += 0.01
+renderer.render scene, camera

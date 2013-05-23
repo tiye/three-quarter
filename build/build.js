@@ -51,27 +51,227 @@
       };
     }();
   require.define('/coffee/main.coffee', function (module, exports, __dirname, __filename) {
-    var camera, geometry, line, material, ratio, renderer, scene;
+    var camera, canvas, geometry, height, line, material, paint_point, polyline, ratio, render, renderer, scene, test, width;
     console.log('loaded');
+    width = 1200;
+    height = 640;
     scene = new THREE.Scene;
-    ratio = window.innerWidth / window.innerHeight;
+    ratio = width / height;
     camera = new THREE.PerspectiveCamera(45, ratio, .1, 500);
-    camera.position.set(0, 0, 100);
+    camera.position.set(0, 0, 200);
     camera.lookAt(new THREE.Vector3(0, 0, 0));
     renderer = new THREE.WebGLRenderer;
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    renderer.setSize(width, height);
+    canvas = renderer.domElement;
+    document.body.appendChild(canvas);
+    canvas.setAttribute('width', '' + width + 'px');
+    canvas.setAttribute('height', '' + height + 'px');
     geometry = new THREE.CubeGeometry;
-    geometry.vertices.push(new THREE.Vector3(-10, 0, 0));
-    geometry.vertices.push(new THREE.Vector3(0, 10, 0));
-    geometry.vertices.push(new THREE.Vector3(10, 0, 0));
-    material = new THREE.LineBasicMaterial({ color: 255 });
+    paint_point = function (a) {
+      return geometry.vertices.push(new THREE.Vector3(a.x, a.y, a.z));
+    };
+    test = require('/coffee/test.coffee', module);
+    polyline = test.test();
+    polyline.forEach(paint_point);
+    material = new THREE.LineBasicMaterial({
+      color: 8947967,
+      linewidth: 2
+    });
     line = new THREE.Line(geometry, material);
     scene.add(line);
-    renderer.render(scene, camera);
+    (render = function () {
+      requestAnimationFrame(render);
+      renderer.render(scene, camera);
+      return line.rotation.y += .01;
+    })();
+  });
+  require.define('/coffee/test.coffee', function (module, exports, __dirname, __filename) {
+    var bend, data, fix, four, point_1, point_2, point_3, point_4, point_5, three;
+    cache$ = require('/coffee/three_quarter.coffee', module);
+    three = cache$.three;
+    four = cache$.four;
+    bend = require('/coffee/bend.coffee', module).bend;
+    point_1 = {
+      x: -20,
+      y: -30,
+      z: -40
+    };
+    point_2 = {
+      x: -10,
+      y: 4,
+      z: 0
+    };
+    point_3 = {
+      x: 30,
+      y: 30,
+      z: 30
+    };
+    point_4 = {
+      x: 20,
+      y: 40,
+      z: 30
+    };
+    point_5 = {
+      x: 40,
+      y: 40,
+      z: 40
+    };
+    data = [
+      point_1,
+      point_2,
+      point_3,
+      point_4
+    ].map(four);
+    fix = function (a) {
+      return a.toFixed(1);
+    };
+    exports.test = function () {
+      var result;
+      console.log('test!');
+      console.log(data);
+      result = data;
+      result = bend(result, data);
+      result = bend(result, data);
+      result = bend(result, data);
+      return result;
+    };
+  });
+  require.define('/coffee/bend.coffee', function (module, exports, __dirname, __filename) {
+    var bend, divide, each_grow, length2, minus, multiply, plus;
+    cache$ = require('/coffee/quaternion.coffee', module);
+    plus = cache$.plus;
+    minus = cache$.minus;
+    multiply = cache$.multiply;
+    divide = cache$.divide;
+    length2 = cache$.length2;
+    each_grow = function (origin, destination, path) {
+      var course, end, factor, polyline, start, whole_course;
+      start = path[0];
+      end = path[path.length - 1];
+      course = minus(end, start);
+      whole_course = minus(destination, origin);
+      factor = divide(whole_course, course);
+      polyline = [];
+      path.slice(1, -1).forEach(function (a) {
+        var b, c;
+        b = minus(a, start);
+        c = multiply(b, factor);
+        return polyline.push(plus(origin, c));
+      });
+      polyline.push(destination);
+      return polyline;
+    };
+    bend = function (list, template) {
+      var base_point, result;
+      base_point = list[0];
+      result = [base_point];
+      list.slice(1).forEach(function (guide_point) {
+        var cache$1, segment;
+        if (1 < (cache$1 = length2(guide_point, base_point)) && cache$1 < 8e5) {
+          segment = each_grow(base_point, guide_point, template);
+          result.push.apply(result, [].slice.call(segment).concat());
+          return base_point = guide_point;
+        }
+      });
+      return result;
+    };
+    exports.bend = bend;
+  });
+  require.define('/coffee/quaternion.coffee', function (module, exports, __dirname, __filename) {
+    var conjugate, divide, length2, minus, multiply, norm, plus, square, sum4Square;
+    plus = function (a, b) {
+      return {
+        x: a.x + b.x,
+        y: a.y + b.y,
+        z: a.z + b.z,
+        w: a.w + b.w
+      };
+    };
+    minus = function (a, b) {
+      return {
+        x: a.x - b.x,
+        y: a.y - b.y,
+        z: a.z - b.z,
+        w: a.w - b.w
+      };
+    };
+    multiply = function (a, b) {
+      return {
+        x: a.x * b.x - a.y * b.y - a.z * b.z - a.w * b.w,
+        y: a.x * b.y + a.y * b.x + a.z * b.w - a.w * b.z,
+        z: a.x * b.z + a.z * b.x + a.w * b.y - a.y * b.w,
+        w: a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y
+      };
+    };
+    conjugate = function (a) {
+      return {
+        x: a.x,
+        y: -a.y,
+        z: -a.z,
+        w: -a.w
+      };
+    };
+    square = function (a) {
+      return a * a;
+    };
+    sum4Square = function (a) {
+      var s4;
+      s4 = square;
+      return s4(a.x) + s4(a.y) + s4(a.z) + s4(a.w);
+    };
+    length2 = function (a) {
+      return sum4Square(a);
+    };
+    norm = function (a) {
+      return Math.pow(length2(a), .5);
+    };
+    divide = function (a, b) {
+      var c, d, realPart;
+      c = conjugate(b);
+      d = multiply(a, c);
+      realPart = norm(d);
+      if (realPart === 0) {
+        return {
+          x: 0,
+          y: 0,
+          z: 0,
+          w: 0
+        };
+      } else {
+        return {
+          x: d.x / realPart,
+          y: d.y / realPart,
+          z: d.z / realPart,
+          w: d.z / realPart
+        };
+      }
+    };
+    exports.plus = plus;
+    exports.minus = minus;
+    exports.multiply = multiply;
+    exports.divide = divide;
+    exports.norm = norm;
+    exports.length2 = length2;
+  });
+  require.define('/coffee/three_quarter.coffee', function (module, exports, __dirname, __filename) {
+    exports.three = function (a) {
+      return {
+        x: a.x,
+        y: a.y,
+        z: a.z
+      };
+    };
+    exports.four = function (a) {
+      return {
+        x: a.x,
+        y: a.y,
+        z: a.z,
+        w: 4
+      };
+    };
   });
   require('/coffee/main.coffee');
 }.call(this, this));
 /*
-//@ sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjp0cnVlLCJzb3VyY2VzIjpbIi9jb2ZmZWUvbWFpbi5jb2ZmZWUiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0lBRUEsT0FBTyxJQUFQLENBQVksUUFBWixDO0lBRUEsS0FBQSxHQUFRLEdBQUEsQ0FBSSxLQUFLLE07SUFDakIsS0FBQSxHQUFRLE1BQUEsV0FBQSxDQUFBLENBQUEsQ0FBb0IsTUFBQSxZO0lBQzVCLE1BQUEsR0FBUyxHQUFBLENBQUksS0FBSyxrQkFBVCxDQUE0QixFQUE1QixFQUFnQyxLQUFoQyxFQUF1QyxFQUF2QyxFQUE0QyxHQUE1QyxDO0lBQ1QsTUFBTSxTQUFTLElBQWYsQ0FBb0IsQ0FBcEIsRUFBdUIsQ0FBdkIsRUFBMEIsR0FBMUIsQztJQUNBLE1BQU0sT0FBTixDQUFjLEdBQUEsQ0FBSyxLQUFLLFFBQVYsQ0FBbUIsQ0FBbkIsRUFBc0IsQ0FBdEIsRUFBeUIsQ0FBekIsQ0FBZCxDO0lBRUEsUUFBQSxHQUFXLEdBQUEsQ0FBSSxLQUFLLGM7SUFDcEIsUUFBUSxRQUFSLENBQWlCLE1BQUEsV0FBakIsRUFBb0MsTUFBQSxZQUFwQyxDO0lBQ0EsUUFBUSxLQUFLLFlBQWIsQ0FBMEIsUUFBQSxXQUExQixDO0lBRUEsUUFBQSxHQUFXLEdBQUEsQ0FBSSxLQUFLLGE7SUFDcEIsUUFBUSxTQUFTLEtBQWpCLENBQXVCLEdBQUEsQ0FBSyxLQUFLLFFBQVYsQ0FBbUIsQ0FBQyxFQUFwQixFQUF3QixDQUF4QixFQUEyQixDQUEzQixDQUF2QixDO0lBQ0EsUUFBUSxTQUFTLEtBQWpCLENBQXVCLEdBQUEsQ0FBSyxLQUFLLFFBQVYsQ0FBbUIsQ0FBbkIsRUFBc0IsRUFBdEIsRUFBMEIsQ0FBMUIsQ0FBdkIsQztJQUNBLFFBQVEsU0FBUyxLQUFqQixDQUF1QixHQUFBLENBQUssS0FBSyxRQUFWLENBQW1CLEVBQW5CLEVBQXVCLENBQXZCLEVBQTBCLENBQTFCLENBQXZCLEM7SUFDQSxRQUFBLEdBQVcsR0FBQSxDQUFJLEtBQUssa0JBQVQsQ0FBNEIsQ0FBQSxDLEtBQUEsRUFBTyxHQUFQLENBQUEsQ0FBNUIsQztJQUNYLElBQUEsR0FBTyxHQUFBLENBQUksS0FBSyxLQUFULENBQWUsUUFBZixFQUF5QixRQUF6QixDO0lBQ1AsS0FBSyxJQUFMLENBQVUsSUFBVixDO0lBRUEsUUFBUSxPQUFSLENBQWdCLEtBQWhCLEVBQXVCLE1BQXZCLEMifQ==
+//@ sourceMappingURL=build.map
 */

@@ -1,4 +1,7 @@
 
+# somting
+console.log "loaded"
+
 scene = new THREE.Scene
 ratio = window.innerWidth / window.innerHeight
 camera = new THREE.PerspectiveCamera 45, ratio, 0.1, 500

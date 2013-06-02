@@ -39,8 +39,7 @@ norm = (a) -> Math.pow (length2 a), 0.5
 divide = (a, b) ->
   c = conjugate b
   d = multiply a, c
-  realPart = norm d
-  # normally use sum4Square, but a trick to be obvious
+  realPart = sum4Square b
   if realPart is 0
     x: 0, y: 0, z: 0, w: 0
   else

@@ -1,5 +1,5 @@
 
-{plus, minus, multiply, divide, length2} = require "./quaternion"
+{plus, minus, multiply, divide, length2} = require "./quaternion.coffee"
 
 each_grow = (origin, destination, path) ->
   start = path[0]

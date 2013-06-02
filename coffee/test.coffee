@@ -1,47 +1,21 @@
 
-{three, four} = require "./three_quarter"
+{three, four} = require "./three_quarter.coffee"
 
-{bend} = require "./bend"
+{bend} = require "./bend.coffee"
 
-point_1 =
-  x: -20
-  y: -30
-  z: -40
+p1 = x: -150, y: 0, z: 0
+p2 = x: -10, y: 0, z: 20
+p3 = x: 0, y: 120, z: 0
+p4 = x: 10, y: 0, z: -20
+p5 = x: 150, y: 0, z: 0
 
-point_2 =
-  x: -10
-  y: 4
-  z: 0
-
-point_3 =
-  x: 30
-  y: 30
-  z: 30
-
-point_4 =
-  x: 20
-  y: 40
-  z: 30
-
-point_5 =
-  x: 40
-  y: 40
-  z: 40
-
-data = [point_1, point_2, point_3, point_4].map four
+data = [p1, p2, p3, p4, p5].map four
 fix = (a) -> a.toFixed 1
 
-exports.test = ->
-  console.log "test!"
-  console.log data
+exports.test_line = ->
   result = data
-  result = bend result, data
-  result = bend result, data
-  result = bend result, data
-  # result = bend result, data
-  # result = bend result, data
-  # result = bend result, data
-  # result.forEach (p) ->
-  #   console.log (fix p.x), (fix p.y), (fix p.z), p.w
+  [1..4].forEach ->
+    result = bend result, data
 
+  # require('./format.coffee').list result 
   result

@@ -8,4 +8,4 @@ exports.four = (a) ->
   x: a.x
   y: a.y
   z: a.z
-  w: 4
+  w: 6

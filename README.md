@@ -1,8 +1,6 @@
 
-A demo of Three.js , print 4D lines in 3D
+A fractal curve but rendered in 3D
 ------
-
-Draw lines with 4dims in 3D space:
 
 ```
 bower install # install Three.js
@@ -13,4 +11,7 @@ node-dev # watch and compile CoffeeScript, etc.
 
 ------
 
-Another part of my paper - -!
+This is the code of my paper, I was trying to draw dractals in 3D space.  
+Here I'm using Quaternion to calculate the positions.  
+For the rendering part, I use Three.js to accomplish.  
+Live demo at: http://jiyinyiyong.github.com/three-quarter/build/

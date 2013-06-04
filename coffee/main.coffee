@@ -8,7 +8,7 @@ height = 700
 scene = new THREE.Scene
 ratio = width / height
 camera = new THREE.PerspectiveCamera 45, ratio, 0.1, 800
-camera.position.set 0, 0, 400
+camera.position.set 0, 0, 300
 camera.lookAt (new THREE.Vector3 0, 0, 0)
 
 renderer = new THREE.WebGLRenderer
@@ -28,7 +28,7 @@ test = require "./test.coffee"
 polyline = test.test_line()
 polyline.forEach paint_point
 
-material = new THREE.LineBasicMaterial color: 0xccccff, linewidth: 1
+material = new THREE.LineBasicMaterial color: 0x000022, linewidth: 2
 line = new THREE.Line geometry, material
 scene.add line
 

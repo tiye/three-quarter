@@ -8,7 +8,7 @@ height = 700
 scene = new THREE.Scene
 ratio = width / height
 camera = new THREE.PerspectiveCamera 45, ratio, 0.1, 800
-camera.position.set 0, 0, 300
+camera.position.set 0, 0, 400
 camera.lookAt (new THREE.Vector3 0, 0, 0)
 
 renderer = new THREE.WebGLRenderer

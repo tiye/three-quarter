@@ -24,7 +24,7 @@ geometry = new THREE.CubeGeometry
 paint_point = (a) ->
   geometry.vertices.push (new THREE.Vector3 a.x, a.y, a.z)
 
-test = require "./test.coffee"
+test = require "./test"
 polyline = test.test_line()
 polyline.forEach paint_point
 

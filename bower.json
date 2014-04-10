@@ -2,7 +2,7 @@
   "name": "three-quarter",
   "version": "0.0.0",
   "dependencies": {
-    "threejs": "*"
+    "three.js": "*"
   },
   "ignore": [
     "**/.*",

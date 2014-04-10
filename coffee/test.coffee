@@ -1,7 +1,7 @@
 
-{three, four} = require "./three_quarter.coffee"
+{three, four} = require "./three_quarter"
 
-{bend} = require "./bend.coffee"
+{bend} = require "./bend"
 
 p1 = x: -150, y: 0, z: 0
 p2 = x: -10, y: 0, z: 20

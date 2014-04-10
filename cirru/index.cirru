@@ -4,6 +4,7 @@ html
     meta (:charset utf-8)
     title (= 3js)
     script (:src bower_components/three.js/three.js)
+    script (:src demo/TrackballControls.js)
     script (:defer) (:src build/build.js)
     link (:rel stylesheet) (:href css/page.css)
   body#main

@@ -4,6 +4,8 @@ A fractal curve but rendered in 3D
 
 3D version of [Snowflake](https://github.com/jiyinyiyong/snowflake)
 
+![3/4](http://jiyinyiyong.u.qiniudn.com/3:4.png)
+
 Live demo: http://repo.tiye.me/three-quarter/
 
 I'm using Quaternion to calculate the curves.

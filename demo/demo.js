@@ -1,27 +1,21 @@
-container = undefined
-stats = undefined
-camera = undefined
-controls = undefined
-scene = undefined
-projector = undefined
-renderer = undefined
-plane = undefined
-INTERSECTED = undefined
-SELECTED = undefined
+var container, stats;
+var camera, controls, scene, projector, renderer;
+var objects = [],
+  plane;
 
-objects = []
-mouse = new THREE.Vector2()
-offset = new THREE.Vector3()
+var mouse = new THREE.Vector2(),
+  offset = new THREE.Vector3(),
+  INTERSECTED, SELECTED;
 
-lineGeometry = undefined
-lineCache = undefined
+init();
+animate();
 
-init = ->
+function init() {
 
   container = document.createElement('div');
   document.body.appendChild(container);
 
-  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100000);
+  camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000);
   camera.position.z = 1000;
 
   controls = new THREE.TrackballControls(camera);
@@ -37,7 +31,7 @@ init = ->
 
   scene.add(new THREE.AmbientLight(0x505050));
 
-  light = new THREE.SpotLight(0xffffff, 1.5);
+  var light = new THREE.SpotLight(0xffffff, 1.5);
   light.position.set(0, 500, 2000);
   light.castShadow = true;
 
@@ -53,20 +47,27 @@ init = ->
 
   scene.add(light);
 
-  boxGeometry = new THREE.BoxGeometry(40, 40, 40);
-  lineGeometry = new THREE.Geometry()
+  var geometry = new THREE.BoxGeometry(40, 40, 40);
 
-  for i in [1..5]
-    rate = (i + 4) / 8
-    object = new THREE.Mesh(boxGeometry, new THREE.MeshLambertMaterial({
-      color: (0xff0000 * rate) + (0x00ff00 * rate) + (0x0000ff * rate)
+  for (var i = 0; i < 200; i++) {
+
+    var object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({
+      color: Math.random() * 0xffffff
     }));
 
     object.material.ambient = object.material.color;
 
-    object.position.x = (i - 3) * 200
-    object.position.y = 0
-    object.position.z = 0
+    object.position.x = Math.random() * 1000 - 500;
+    object.position.y = Math.random() * 600 - 300;
+    object.position.z = Math.random() * 800 - 400;
+
+    object.rotation.x = Math.random() * 2 * Math.PI;
+    object.rotation.y = Math.random() * 2 * Math.PI;
+    object.rotation.z = Math.random() * 2 * Math.PI;
+
+    object.scale.x = Math.random() * 2 + 1;
+    object.scale.y = Math.random() * 2 + 1;
+    object.scale.z = Math.random() * 2 + 1;
 
     object.castShadow = true;
     object.receiveShadow = true;
@@ -74,6 +75,8 @@ init = ->
     scene.add(object);
 
     objects.push(object);
+
+  }
 
   plane = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000, 8, 8), new THREE.MeshBasicMaterial({
     color: 0x000000,
@@ -98,69 +101,64 @@ init = ->
 
   container.appendChild(renderer.domElement);
 
+  var info = document.createElement('div');
+  info.style.position = 'absolute';
+  info.style.top = '10px';
+  info.style.width = '100%';
+  info.style.textAlign = 'center';
+  info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - draggable cubes';
+  container.appendChild(info);
+
   renderer.domElement.addEventListener('mousemove', onDocumentMouseMove, false);
   renderer.domElement.addEventListener('mousedown', onDocumentMouseDown, false);
   renderer.domElement.addEventListener('mouseup', onDocumentMouseUp, false);
 
+  //
 
   window.addEventListener('resize', onWindowResize, false);
 
-onWindowResize = ->
+}
+
+function onWindowResize() {
 
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-onDocumentMouseMove = (event) ->
+}
+
+function onDocumentMouseMove(event) {
+
   event.preventDefault();
 
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-  vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+  //
+
+  var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
   projector.unprojectVector(vector, camera);
 
-  raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+  var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
 
-  if SELECTED
-    intersects = raycaster.intersectObject(plane);
+
+  if (SELECTED) {
+
+    var intersects = raycaster.intersectObject(plane);
     SELECTED.position.copy(intersects[0].point.sub(offset));
-
-    myList = []
-    for cube, index in objects
-      p = cube.position
-      myList.push x: p.x, y: p.y, z: p.z
-
-    {bend} = require './bend'
-    {three, four} = require "./three_quarter"
-
-    result = data = myList.map four
-    [1..6].forEach ->
-      result = bend result, data
-
-    lineGeometry.vertices = []
-    result.forEach (a) ->
-      lineGeometry.vertices.push (new THREE.Vector3 a.x, a.y, a.z)
-    lineGeometry.verticesNeedUpdate = yes
-
-    material = new THREE.LineBasicMaterial color: 0x0000ff
-    line = new THREE.Line lineGeometry, material
-
-    scene.remove lineCache if lineCache?
-    scene.add line
-    lineCache = line
-
     return;
 
-  intersects = raycaster.intersectObjects(objects);
+  }
 
-  if intersects.length > 0
 
-    if INTERSECTED != intersects[0].object
+  var intersects = raycaster.intersectObjects(objects);
 
-      if INTERSECTED
-        INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
+  if (intersects.length > 0) {
+
+    if (INTERSECTED != intersects[0].object) {
+
+      if (INTERSECTED) INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
 
       INTERSECTED = intersects[0].object;
       INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
@@ -168,63 +166,80 @@ onDocumentMouseMove = (event) ->
       plane.position.copy(INTERSECTED.position);
       plane.lookAt(camera.position);
 
-    container.style.cursor = 'pointer'
+    }
 
-  else
+    container.style.cursor = 'pointer';
 
-    if INTERSECTED
-      INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
+  } else {
+
+    if (INTERSECTED) INTERSECTED.material.color.setHex(INTERSECTED.currentHex);
 
     INTERSECTED = null;
 
     container.style.cursor = 'auto';
 
-onDocumentMouseDown = (event) ->
+  }
+
+}
+
+function onDocumentMouseDown(event) {
 
   event.preventDefault();
 
-  vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+  var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
   projector.unprojectVector(vector, camera);
 
-  raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+  var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
 
-  intersects = raycaster.intersectObjects(objects);
+  var intersects = raycaster.intersectObjects(objects);
 
-  if intersects.length > 0
+  if (intersects.length > 0) {
 
     controls.enabled = false;
 
     SELECTED = intersects[0].object;
 
-    intersects = raycaster.intersectObject(plane);
+    var intersects = raycaster.intersectObject(plane);
     offset.copy(intersects[0].point).sub(plane.position);
 
     container.style.cursor = 'move';
 
+  }
 
-onDocumentMouseUp = (event) ->
+}
+
+function onDocumentMouseUp(event) {
 
   event.preventDefault();
 
   controls.enabled = true;
 
-  if INTERSECTED
+  if (INTERSECTED) {
 
     plane.position.copy(INTERSECTED.position);
 
     SELECTED = null;
 
+  }
+
   container.style.cursor = 'auto';
 
-animate = ->
-  setTimeout ->
-    requestAnimationFrame(animate);
-    render()
-  , 20
-    
-render = ->
+}
+
+//
+
+function animate() {
+
+  requestAnimationFrame(animate);
+
+  render();
+  
+}
+
+function render() {
+
   controls.update();
+
   renderer.render(scene, camera);
 
-init();
-animate();
+}

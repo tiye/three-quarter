@@ -1,5 +1,5 @@
 
-{plus, minus, multiply, divide, length2} = require "./quaternion.coffee"
+{plus, minus, multiply, divide, length2} = require "./quaternion"
 
 each_grow = (origin, destination, path) ->
   start = path[0]
@@ -24,7 +24,7 @@ bend = (list, template) ->
   result = [base_point]
 
   list[1..].forEach (guide_point) ->
-    if 1 < (length2 guide_point, base_point) < 800000
+    if 1 < (length2 guide_point, base_point) < 400000
       segment = each_grow base_point, guide_point, template
       result.push segment...
       base_point = guide_point

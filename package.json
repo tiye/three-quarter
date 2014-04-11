@@ -1,0 +1,27 @@
+{
+  "name": "three-quarter",
+  "version": "0.0.0",
+  "description": "3d fractal curve making",
+  "main": "js/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jiyinyiyong/three-quarter.git"
+  },
+  "keywords": [
+    "fractal"
+  ],
+  "author": "jiyinyiyong",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jiyinyiyong/three-quarter/issues"
+  },
+  "homepage": "https://github.com/jiyinyiyong/three-quarter",
+  "devDependencies": {
+    "cirru-html": "~0.1.7",
+    "devtools-reloader-station": "0.0.4",
+    "browserify": "~3.39.0"
+  }
+}

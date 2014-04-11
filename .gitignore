@@ -1,2 +1,5 @@
-node_modules
-components
+node_modules/
+bower_components/
+build/
+js/
+index.html
